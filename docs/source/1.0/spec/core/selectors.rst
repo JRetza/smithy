@@ -1359,6 +1359,50 @@ trait applied to it:
     service :not(-[trait]-> [trait|protocolDefinition])
 
 
+``:topdown``
+------------
+
+The ``:topdown`` function performs a directed traversal of the binding
+hierarchy of services, resources, and operations to find shapes that match a
+predicate selector or that inherit the match from a binding. Exactly one or
+two selectors can be provided to the ``:topdown`` selector:
+
+1. The first selector is used to mark a shape as a match. If the selector
+   yields any results, then it is considered a match.
+2. If provided, the second selector is used to remove the match of the shape
+   for the current shape before traversing the resource and operation
+   bindings. If this selector yields any results, then the shape is not
+   considered a match.
+
+Any shape that is a match is yielded by the selector.
+
+The following selector finds all shapes that are marked with the
+``aws.api#dataPlane`` trait or shapes that are bound within the containment
+hierarchy of resource and service shapes that are marked as such:
+
+.. code-block:: none
+
+    :topdown([trait|aws.api#dataPlane])
+
+The following selector finds all shapes that are marked with the
+``aws.api#dataPlane`` trait, but does not match shapes where the
+``aws.api#controlPlane`` trait is used to override the ``aws.api#dataPlane``
+trait:
+
+.. code-block:: none
+
+    :topdown([trait|aws.api#dataPlane], [trait|aws.api#controlPlane])
+
+The following selector matches shapes that utilize HTTP basic auth
+by looking for the :ref:`httpBasicAuth-trait` in the :ref:`auth-trait`
+applied to service shapes and operation shapes:
+
+.. code-block:: none
+
+    :topdown([trait|auth|(values)='smithy.api#httpBasicAuth'],
+             [trait|auth]:not([trait|auth|(values)='smithy.api#httpBasicAuth']))
+
+
 .. _selector-variables:
 
 Variables
